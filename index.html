@@ -6,6 +6,7 @@
     <title>自作問題集アプリ</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
 </head>
 <body>
     <!-- ログイン画面 -->
@@ -41,7 +42,20 @@
     <!-- メイン画面 -->
     <div id="main-screen" class="screen">
         <nav class="navbar">
+            <button id="menu-toggle" class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-brand">QuizMaster</div>
+            <button id="logout-btn" class="btn-logout">ログアウト</button>
+        </nav>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>メニュー</h3>
+                <button id="sidebar-close" class="sidebar-close">&times;</button>
+            </div>
             <div class="nav-menu">
                 <button class="nav-btn active" data-view="dashboard">
                     <span class="icon">📊</span>
@@ -60,8 +74,9 @@
                     <span>後で見る</span>
                 </button>
             </div>
-            <button id="logout-btn" class="btn-logout">ログアウト</button>
-        </nav>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <main class="main-content">
             <!-- ダッシュボード -->
