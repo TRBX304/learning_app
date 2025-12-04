@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自作問題集アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="app-title">QuizMaster</h1>
+                <p class="app-subtitle">自分だけの問題集を作ろう</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" data-tab="login">ログイン</button>
+                <button class="tab-btn" data-tab="signup">新規登録</button>
+            </div>
+
+            <div id="login-form" class="auth-form active">
+                <input type="email" id="login-email" placeholder="メールアドレス" required>
+                <input type="password" id="login-password" placeholder="パスワード" required>
+                <button id="login-btn" class="btn-primary">ログイン</button>
+            </div>
+
+            <div id="signup-form" class="auth-form">
+                <input type="text" id="signup-username" placeholder="ユーザー名" required>
+                <input type="email" id="signup-email" placeholder="メールアドレス" required>
+                <input type="password" id="signup-password" placeholder="パスワード（6文字以上）" required>
+                <button id="signup-btn" class="btn-primary">登録する</button>
+            </div>
+
+            <div id="auth-message" class="message"></div>
+        </div>
+    </div>
+
+    <!-- メイン画面 -->
+    <div id="main-screen" class="screen">
+        <nav class="navbar">
+            <div class="nav-brand">QuizMaster</div>
+            <div class="nav-menu">
+                <button class="nav-btn active" data-view="dashboard">
+                    <span class="icon">📊</span>
+                    <span>ダッシュボード</span>
+                </button>
+                <button class="nav-btn" data-view="subjects">
+                    <span class="icon">📚</span>
+                    <span>科目管理</span>
+                </button>
+                <button class="nav-btn" data-view="quiz">
+                    <span class="icon">✏️</span>
+                    <span>問題に挑戦</span>
+                </button>
+                <button class="nav-btn" data-view="bookmarks">
+                    <span class="icon">🔖</span>
+                    <span>後で見る</span>
+                </button>
+            </div>
+            <button id="logout-btn" class="btn-logout">ログアウト</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- ダッシュボード -->
+            <div id="dashboard-view" class="view active">
+                <div class="dashboard-header">
+                    <h2>学習ダッシュボード</h2>
+                    <p class="welcome-text">ようこそ、<span id="username-display"></span>さん</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-questions">0</div>
+                            <div class="stat-label">総問題数</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="answered-questions">0</div>
+                            <div class="stat-label">解答済み問題</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="overall-accuracy">0%</div>
+                            <div class="stat-label">全体正答率</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="total-subjects">0</div>
+                            <div class="stat-label">登録科目数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>苦手な科目</h3>
+                    <div id="weak-subjects" class="weak-subjects-list">
+                        <p class="empty-state">データがありません</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>日々の学習記録</h3>
+                    <canvas id="learning-chart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- 科目管理 -->
+            <div id="subjects-view" class="view">
+                <div class="view-header">
+                    <h2>科目管理</h2>
+                    <button id="add-subject-btn" class="btn-primary">+ 新しい科目を追加</button>
+                </div>
+
+                <div id="subjects-list" class="subjects-grid">
+                    <p class="empty-state">科目がありません。新しい科目を追加してください。</p>
+                </div>
+
+                <!-- 科目詳細モーダル -->
+                <div id="subject-detail-modal" class="modal">
+                    <div class="modal-content large">
+                        <div class="modal-header">
+                            <h3 id="subject-detail-name"></h3>
+                            <button class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="modal-actions">
+                                <button id="add-question-btn" class="btn-primary">+ 問題を追加</button>
+                                <button id="edit-subject-btn" class="btn-secondary">科目を編集</button>
+                                <button id="delete-subject-btn" class="btn-danger">科目を削除</button>
+                            </div>
+                            
+                            <div id="questions-list" class="questions-list">
+                                <p class="empty-state">問題がありません</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 科目追加/編集モーダル -->
+                <div id="subject-form-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="subject-form-title">新しい科目</h3>
+                            <button class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="subject-form">
+                                <div class="form-group">
+                                    <label for="subject-name">科目名</label>
+                                    <input type="text" id="subject-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject-description">説明</label>
+                                    <textarea id="subject-description" rows="3"></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">保存</button>
+                                    <button type="button" class="btn-secondary close-modal">キャンセル</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 問題追加/編集モーダル -->
+                <div id="question-form-modal" class="modal">
+                    <div class="modal-content large">
+                        <div class="modal-header">
+                            <h3 id="question-form-title">新しい問題</h3>
+                            <button class="close-btn">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="question-form">
+                                <div class="form-group">
+                                    <label for="question-text">問題文</label>
+                                    <textarea id="question-text" rows="3" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="question-image">問題画像（任意）</label>
+                                    <input type="file" id="question-image" accept="image/*">
+                                    <div id="image-preview" class="image-preview"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>選択肢</label>
+                                    <div class="options-grid">
+                                        <div class="option-item">
+                                            <span class="option-label">A</span>
+                                            <input type="text" id="option-a" required>
+                                        </div>
+                                        <div class="option-item">
+                                            <span class="option-label">B</span>
+                                            <input type="text" id="option-b" required>
+                                        </div>
+                                        <div class="option-item">
+                                            <span class="option-label">C</span>
+                                            <input type="text" id="option-c" required>
+                                        </div>
+                                        <div class="option-item">
+                                            <span class="option-label">D</span>
+                                            <input type="text" id="option-d" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="correct-answer">正解</label>
+                                    <select id="correct-answer" required>
+                                        <option value="">選択してください</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="explanation">解説</label>
+                                    <textarea id="explanation" rows="3"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tags">タグ（カンマ区切り）</label>
+                                    <input type="text" id="tags" placeholder="例: 重要, 計算問題, 基礎">
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">保存</button>
+                                    <button type="button" class="btn-secondary close-modal">キャンセル</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 問題に挑戦 -->
+            <div id="quiz-view" class="view">
+                <div id="quiz-setup" class="quiz-setup active">
+                    <h2>問題に挑戦</h2>
+                    <div class="form-group">
+                        <label for="quiz-subject">科目を選択</label>
+                        <select id="quiz-subject" required>
+                            <option value="">選択してください</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quiz-count">問題数</label>
+                        <input type="number" id="quiz-count" min="1" value="10">
+                    </div>
+                    <button id="start-quiz-btn" class="btn-primary">開始</button>
+                </div>
+
+                <div id="quiz-play" class="quiz-play">
+                    <div class="quiz-header">
+                        <div class="quiz-progress">
+                            <span id="current-question-num">1</span> / <span id="total-question-num">10</span>
+                        </div>
+                        <div class="quiz-score">
+                            正答率: <span id="current-accuracy">0%</span>
+                        </div>
+                        <button id="quit-quiz-btn" class="btn-secondary">終了</button>
+                    </div>
+
+                    <div class="quiz-content">
+                        <div class="question-card">
+                            <div id="question-display" class="question-text"></div>
+                            <div id="question-image-display" class="question-image"></div>
+                            
+                            <div class="answer-options">
+                                <button class="option-btn" data-option="A">
+                                    <span class="option-letter">A</span>
+                                    <span class="option-text"></span>
+                                </button>
+                                <button class="option-btn" data-option="B">
+                                    <span class="option-letter">B</span>
+                                    <span class="option-text"></span>
+                                </button>
+                                <button class="option-btn" data-option="C">
+                                    <span class="option-letter">C</span>
+                                    <span class="option-text"></span>
+                                </button>
+                                <button class="option-btn" data-option="D">
+                                    <span class="option-letter">D</span>
+                                    <span class="option-text"></span>
+                                </button>
+                            </div>
+
+                            <div id="answer-feedback" class="answer-feedback"></div>
+                            
+                            <div class="quiz-actions">
+                                <button id="bookmark-question-btn" class="btn-bookmark">🔖 後で見る</button>
+                                <button id="next-question-btn" class="btn-primary" style="display: none;">次の問題</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="quiz-result" class="quiz-result">
+                    <div class="result-card">
+                        <h2>結果</h2>
+                        <div class="result-score">
+                            <div class="score-circle">
+                                <span id="result-percentage">0%</span>
+                            </div>
+                            <p class="score-detail">
+                                <span id="result-correct">0</span> / <span id="result-total">0</span> 問正解
+                            </p>
+                        </div>
+
+                        <div class="wrong-questions">
+                            <h3>間違えた問題</h3>
+                            <div id="wrong-questions-list"></div>
+                        </div>
+
+                        <div class="result-actions">
+                            <button id="retry-quiz-btn" class="btn-primary">もう一度</button>
+                            <button id="back-to-setup-btn" class="btn-secondary">科目選択に戻る</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 後で見る -->
+            <div id="bookmarks-view" class="view">
+                <h2>後で見る</h2>
+                <div id="bookmarks-list" class="bookmarks-list">
+                    <p class="empty-state">ブックマークした問題はありません</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
