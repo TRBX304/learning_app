@@ -2,6 +2,12 @@
 const SUPABASE_URL = 'https://etgwytkuwxdogonqokjd.supabase.co'; // 例: 'https://xxxxx.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0Z3d5dGt1d3hkb2dvbnFva2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTY4NzUsImV4cCI6MjA4MDMzMjg3NX0.8j2TDRnLf3BqI4mBFzxsm5tIKuNtpJs2N1mNAtjnCEU';
 
+// 設定が正しく読み込まれているかチェック
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.error('Supabaseの設定が見つかりません。config.jsファイルを作成してください。');
+    alert('アプリの設定が完了していません。README.mdを参照してconfig.jsファイルを作成してください。');
+}
+
 // Supabaseクライアントの初期化
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -54,6 +60,11 @@ async function initializeApp() {
 // イベントリスナー
 // =========================================
 function setupEventListeners() {
+    // ハンバーガーメニュー
+    document.getElementById('menu-toggle').addEventListener('click', toggleSidebar);
+    document.getElementById('sidebar-close').addEventListener('click', closeSidebar);
+    document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
     // ログイン/サインアップタブ
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -185,6 +196,25 @@ async function loadUserProfile() {
 }
 
 // =========================================
+// サイドバー管理
+// =========================================
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+}
+
+// =========================================
 // ビュー管理
 // =========================================
 function showScreen(screenId) {
@@ -200,6 +230,11 @@ function switchView(viewName) {
     // ビューの切り替え
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(`${viewName}-view`).classList.add('active');
+
+    // モバイルではサイドバーを閉じる
+    if (window.innerWidth <= 768) {
+        closeSidebar();
+    }
 
     // 各ビューのデータ読み込み
     switch(viewName) {
