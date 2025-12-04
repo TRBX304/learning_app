@@ -806,6 +806,7 @@ body {
 
 /* クイズ */
 .quiz-setup {
+    display: block;
     background: var(--bg-card);
     padding: 2rem;
     border-radius: 12px;
@@ -824,6 +825,14 @@ body {
 }
 
 .quiz-play.active {
+    display: block;
+}
+
+.quiz-result {
+    display: none;
+}
+
+.quiz-result.active {
     display: block;
 }
 
