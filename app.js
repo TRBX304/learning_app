@@ -231,10 +231,8 @@ function switchView(viewName) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(`${viewName}-view`).classList.add('active');
 
-    // モバイルではサイドバーを閉じる
-    if (window.innerWidth <= 768) {
-        closeSidebar();
-    }
+    // サイドバーを閉じる
+    closeSidebar();
 
     // 各ビューのデータ読み込み
     switch(viewName) {
