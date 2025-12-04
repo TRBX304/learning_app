@@ -234,6 +234,9 @@ function switchView(viewName) {
     // サイドバーを閉じる
     closeSidebar();
 
+    // 画面の一番上にスクロール
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // 各ビューのデータ読み込み
     switch(viewName) {
         case 'dashboard':
@@ -255,11 +258,21 @@ function switchView(viewName) {
 // ダッシュボード
 // =========================================
 async function loadDashboard() {
-    // 総問題数
-    const { count: totalQuestions } = await supabase
-        .from('questions')
-        .select('*', { count: 'exact', head: true })
-        .eq('subject_id', supabase.from('subjects').select('id').eq('user_id', currentUser.id));
+    // 総問題数 - ユーザーの全科目の問題を集計
+    const { data: userSubjects } = await supabase
+        .from('subjects')
+        .select('id')
+        .eq('user_id', currentUser.id);
+
+    let totalQuestions = 0;
+    if (userSubjects && userSubjects.length > 0) {
+        const subjectIds = userSubjects.map(s => s.id);
+        const { count } = await supabase
+            .from('questions')
+            .select('*', { count: 'exact', head: true })
+            .in('subject_id', subjectIds);
+        totalQuestions = count || 0;
+    }
 
     // 解答済み問題数（重複なし）
     const { data: answeredData } = await supabase
@@ -280,16 +293,13 @@ async function loadDashboard() {
     const overallAccuracy = totalAnswers > 0 ? ((correctCount / totalAnswers) * 100).toFixed(1) : 0;
 
     // 登録科目数
-    const { count: totalSubjects } = await supabase
-        .from('subjects')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', currentUser.id);
+    const totalSubjects = userSubjects?.length || 0;
 
     // 統計を表示
-    document.getElementById('total-questions').textContent = totalQuestions || 0;
+    document.getElementById('total-questions').textContent = totalQuestions;
     document.getElementById('answered-questions').textContent = answeredQuestions;
     document.getElementById('overall-accuracy').textContent = `${overallAccuracy}%`;
-    document.getElementById('total-subjects').textContent = totalSubjects || 0;
+    document.getElementById('total-subjects').textContent = totalSubjects;
 
     // 苦手な科目を表示
     await loadWeakSubjects();
@@ -717,10 +727,15 @@ async function startQuiz() {
     currentQuiz.answers = [];
     currentQuiz.correctCount = 0;
 
+    // 画面を切り替え
     document.getElementById('quiz-setup').classList.remove('active');
     document.getElementById('quiz-play').classList.add('active');
 
+    // 問題を表示
     displayQuestion();
+
+    // 画面の一番上にスクロール
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function displayQuestion() {
@@ -829,8 +844,12 @@ function nextQuestion() {
 
     if (currentQuiz.currentIndex < currentQuiz.questions.length) {
         displayQuestion();
+        // 画面の一番上にスクロール
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
         showQuizResult();
+        // 画面の一番上にスクロール
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
@@ -869,6 +888,8 @@ function showQuizResult() {
 function quitQuiz() {
     if (confirm('クイズを終了しますか？')) {
         backToQuizSetup();
+        // 画面の一番上にスクロール
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
@@ -881,12 +902,16 @@ function retryQuiz() {
     document.getElementById('quiz-play').classList.add('active');
 
     displayQuestion();
+    // 画面の一番上にスクロール
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function backToQuizSetup() {
     document.getElementById('quiz-play').classList.remove('active');
     document.getElementById('quiz-result').classList.remove('active');
     document.getElementById('quiz-setup').classList.add('active');
+    // 画面の一番上にスクロール
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================================
