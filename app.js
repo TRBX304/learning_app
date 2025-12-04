@@ -2,6 +2,7 @@
 const SUPABASE_URL = 'https://etgwytkuwxdogonqokjd.supabase.co'; // 例: 'https://xxxxx.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0Z3d5dGt1d3hkb2dvbnFva2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTY4NzUsImV4cCI6MjA4MDMzMjg3NX0.8j2TDRnLf3BqI4mBFzxsm5tIKuNtpJs2N1mNAtjnCEU';
 
+
 // 設定が正しく読み込まれているかチェック
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     console.error('Supabaseの設定が見つかりません。config.jsファイルを作成してください。');
@@ -698,6 +699,11 @@ async function loadQuizSubjects() {
             select.appendChild(option);
         });
     }
+
+    // クイズビューに切り替わった時は常にセットアップ画面を表示
+    document.getElementById('quiz-setup').style.display = 'block';
+    document.getElementById('quiz-play').classList.remove('active');
+    document.getElementById('quiz-result').classList.remove('active');
 }
 
 async function startQuiz() {
@@ -727,8 +733,9 @@ async function startQuiz() {
     currentQuiz.answers = [];
     currentQuiz.correctCount = 0;
 
-    // 画面を切り替え
-    document.getElementById('quiz-setup').classList.remove('active');
+    // セットアップ画面を非表示、プレイ画面を表示
+    document.getElementById('quiz-setup').style.display = 'none';
+    document.getElementById('quiz-result').classList.remove('active');
     document.getElementById('quiz-play').classList.add('active');
 
     // 問題を表示
@@ -909,7 +916,7 @@ function retryQuiz() {
 function backToQuizSetup() {
     document.getElementById('quiz-play').classList.remove('active');
     document.getElementById('quiz-result').classList.remove('active');
-    document.getElementById('quiz-setup').classList.add('active');
+    document.getElementById('quiz-setup').style.display = 'block';
     // 画面の一番上にスクロール
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -1065,3 +1072,4 @@ function closeAllModals() {
         modal.classList.remove('active');
     });
 }
+
