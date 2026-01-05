@@ -1,0 +1,9 @@
+window.SUPABASE_CONFIG = {
+    // Supabaseの設定
+    url: 'https://etgwytkuwxdogonqokjd.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0Z3d5dGt1d3hkb2dvbnFva2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NTY4NzUsImV4cCI6MjA4MDMzMjg3NX0.8j2TDRnLf3BqI4mBFzxsm5tIKuNtpJs2N1mNAtjnCEU',
+    
+    // Edge Function のエンドポイント
+    // Edge Function を作成してデプロイした後、このURLが有効になります
+    edgeFunctionUrl: 'https://etgwytkuwxdogonqokjd.supabase.co/functions/v1/openai-proxy'
+};

@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#bookGradient)" filter="url(#shadow)"/>
+  
+  <!-- Book -->
+  <g transform="translate(50, 60)">
+    <!-- Book spine and left page -->
+    <path d="M 10 10 L 10 80 Q 10 85 15 85 L 45 85 L 45 10 Z" 
+          fill="#f1f5f9" opacity="0.95"/>
+    
+    <!-- Book right page -->
+    <path d="M 55 10 L 55 85 L 85 85 Q 90 85 90 80 L 90 10 Z" 
+          fill="#f1f5f9" opacity="0.95"/>
+    
+    <!-- Book spine highlight -->
+    <rect x="45" y="10" width="10" height="75" fill="#cbd5e1"/>
+    
+    <!-- Page lines -->
+    <line x1="20" y1="25" x2="40" y2="25" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    <line x1="20" y1="35" x2="40" y2="35" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    <line x1="20" y1="45" x2="40" y2="45" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    
+    <line x1="60" y1="25" x2="80" y2="25" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    <line x1="60" y1="35" x2="80" y2="35" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    <line x1="60" y1="45" x2="80" y2="45" stroke="#667eea" stroke-width="2" opacity="0.4"/>
+    
+    <!-- Question mark on left page -->
+    <text x="30" y="70" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+          fill="#667eea" text-anchor="middle">?</text>
+  </g>
+  
+  <!-- Check mark badge -->
+  <g transform="translate(115, 115)">
+    <!-- Badge circle -->
+    <circle cx="30" cy="30" r="28" fill="url(#checkGradient)" filter="url(#shadow)"/>
+    <circle cx="30" cy="30" r="24" fill="#f1f5f9"/>
+    
+    <!-- Check mark -->
+    <path d="M 20 30 L 27 37 L 42 22" 
+          stroke="url(#checkGradient)" 
+          stroke-width="4" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+  </g>
+</svg>

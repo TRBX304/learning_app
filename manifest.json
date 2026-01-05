@@ -1,0 +1,24 @@
+{
+  "name": "自作問題集アプリ - My Question Bank",
+  "short_name": "自作問題集",
+  "description": "自分だけの問題集を作成・管理できるアプリ",
+  "start_url": "/2025/itk/learning_app/with_ai/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
