@@ -15,3 +15,6 @@
 
 ### 動作環境
 - 最新のWebブラウザ（Chrome等）
+
+### 以下のURLから実際のサイトに飛べます
+https://ka-joho.net/2025/itk/learning_app/with_ai/
